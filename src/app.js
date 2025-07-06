@@ -16,7 +16,7 @@ app.post("/signup",async(req,res)=>{
   }
   catch(err){
 
-    res.status(400).send("something went wrong")
+    res.status(400).send("something went wrong" + err)
     console.log(err);
     
   }
@@ -64,7 +64,7 @@ app.delete("/user",async(req,res)=>{
 
     }
     catch(err){
-        res.send("something went wrong")
+        res.send("something went wrong" + err)
     }
 })
 
