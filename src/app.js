@@ -2,19 +2,71 @@ const express=require('express')
 const connectDB=require("./config/database")
 const app=express()
 const User=require("./models/user")
+const validator=require("validator")
+const bcrypt=require("bcrypt")
 
 app.use(express.json())
 
 app.post("/signup",async(req,res)=>{
 
   try{
-      const user=new User(req.body)
-    console.log(user._id);
+    const {firstName,lastName,emailId,password,age,gender}=req.body
+    const encryptedPassword=await bcrypt.hash(password,10)
+    console.log(encryptedPassword);
+    
+      const user=new User({
+        firstName,
+        lastName,
+        emailId,
+        password:encryptedPassword,
+        age,
+        gender
+      })
     
     await user.save()
     res.send("user added successfully")
   }
   catch(err){
+
+    res.status(400).send("something went wrong" + err)
+    console.log(err);
+    
+  }
+})
+
+app.post("/login",async(req,res)=>{
+
+    try{
+        const{emailId,password}=req.body
+
+    if(!validator.isEmail(emailId)){
+        throw new Error("invalid credentials")
+    }
+
+    const user=await User.findOne({emailId})
+
+    if(!user){
+        throw new Error("no user present")
+    }
+
+    const isPassworValid=await bcrypt.compare(password,user.password)
+    if(!isPassworValid){
+        res.send("invalid credentials")
+    }
+    else{
+        res.status(200).json({
+            message:"login successfull",
+            user:{
+                firstName:user.firstName,
+                lastName:user.lastName,
+                age:user.age,
+                gender:user.gender
+            }
+
+        })
+    }
+    }
+    catch(err){
 
     res.status(400).send("something went wrong" + err)
     console.log(err);
@@ -69,19 +121,33 @@ app.delete("/user",async(req,res)=>{
 })
 
 app.patch("/user",async(req,res)=>{
-    console.log(req.body);
     
+    const data={...req.body}
+
+    delete data.emailId
     const emailId=req.body.emailId
-    const data=req.body
+
+    console.log(data);
+    console.log(emailId);
+
+    
 
     try{
+
+        const ALLOWED_UPDATES=["gender","age","password"]
+
+        const isUpdateAllowed=Object.keys(data).every((k)=>ALLOWED_UPDATES.includes(k))
+
+        if(!isUpdateAllowed){
+            throw new Error("Update not allowed")
+        }
 
         const updatedUser=await User.findOneAndUpdate({emailId},data,{new:true})
         res.send(updatedUser)
 
     }
     catch(err){
-        res.send("something went wrong")
+        res.send("something went wrong"+err)
     }
 })
 
