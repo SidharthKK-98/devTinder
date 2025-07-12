@@ -4,8 +4,11 @@ const app=express()
 const User=require("./models/user")
 const validator=require("validator")
 const bcrypt=require("bcrypt")
+const cookie=require('cookie-parser')
+const {userAuth}=require("./middlewares/auth")
 
 app.use(express.json())
+app.use(cookie())
 
 app.post("/signup",async(req,res)=>{
 
@@ -38,6 +41,8 @@ app.post("/login",async(req,res)=>{
 
     try{
         const{emailId,password}=req.body
+        
+        
 
     if(!validator.isEmail(emailId)){
         throw new Error("invalid credentials")
@@ -49,20 +54,19 @@ app.post("/login",async(req,res)=>{
         throw new Error("no user present")
     }
 
-    const isPassworValid=await bcrypt.compare(password,user.password)
+    const isPassworValid=user.validatePassword(password)
+
     if(!isPassworValid){
         res.send("invalid credentials")
     }
     else{
-        res.status(200).json({
-            message:"login successfull",
-            user:{
-                firstName:user.firstName,
-                lastName:user.lastName,
-                age:user.age,
-                gender:user.gender
-            }
+        const token=  user.getJWT() 
+        
+        res.cookie("token",token)
 
+        res.status(200).json({
+            message:"login successfull"
+            
         })
     }
     }
@@ -72,6 +76,23 @@ app.post("/login",async(req,res)=>{
     console.log(err);
     
   }
+})
+
+app.get("/profile",userAuth,async(req,res)=>{
+
+    try{
+        const profile= req.user
+        res.send(profile)
+         
+    }
+     catch(err){
+
+    res.status(400).send("something went wrong" + err)
+    console.log(err);
+    
+  }
+
+ 
 })
 
 app.get("/user",async(req,res)=>{
