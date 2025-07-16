@@ -1,176 +1,19 @@
 const express=require('express')
 const connectDB=require("./config/database")
 const app=express()
-const User=require("./models/user")
-const validator=require("validator")
-const bcrypt=require("bcrypt")
 const cookie=require('cookie-parser')
-const {userAuth}=require("./middlewares/auth")
+const authRoutes=require("../src/routes/auth")
+const profileRoutes=require("../src/routes/profile")
 
 app.use(express.json())
 app.use(cookie())
 
-app.post("/signup",async(req,res)=>{
 
-  try{
-    const {firstName,lastName,emailId,password,age,gender}=req.body
-    const encryptedPassword=await bcrypt.hash(password,10)
-    console.log(encryptedPassword);
-    
-      const user=new User({
-        firstName,
-        lastName,
-        emailId,
-        password:encryptedPassword,
-        age,
-        gender
-      })
-    
-    await user.save()
-    res.send("user added successfully")
-  }
-  catch(err){
+app.use("/",authRoutes)
+app.use("/",profileRoutes)
 
-    res.status(400).send("something went wrong" + err)
-    console.log(err);
-    
-  }
-})
 
-app.post("/login",async(req,res)=>{
 
-    try{
-        const{emailId,password}=req.body
-        
-        
-
-    if(!validator.isEmail(emailId)){
-        throw new Error("invalid credentials")
-    }
-
-    const user=await User.findOne({emailId})
-
-    if(!user){
-        throw new Error("no user present")
-    }
-
-    const isPassworValid=user.validatePassword(password)
-
-    if(!isPassworValid){
-        res.send("invalid credentials")
-    }
-    else{
-        const token=  user.getJWT() 
-        
-        res.cookie("token",token)
-
-        res.status(200).json({
-            message:"login successfull"
-            
-        })
-    }
-    }
-    catch(err){
-
-    res.status(400).send("something went wrong" + err)
-    console.log(err);
-    
-  }
-})
-
-app.get("/profile",userAuth,async(req,res)=>{
-
-    try{
-        const profile= req.user
-        res.send(profile)
-         
-    }
-     catch(err){
-
-    res.status(400).send("something went wrong" + err)
-    console.log(err);
-    
-  }
-
- 
-})
-
-app.get("/user",async(req,res)=>{
-    try{
-       const users= await User.findOne({emailId:req.body.emailId})
-       if(!users){
-        res.send("no user found")
-       }
-       else{
-            res.send(users)
-
-       }
-    }
-    catch(err){
-        res.send("something went wrong")
-    }
-})
-
-app.get("/feed",async(req,res)=>{
-    try{
-       const users= await User.find({})
-       if(!users){
-        res.send("no user found")
-       }
-       else{
-            res.send(users)
-
-       }
-    }
-    catch(err){
-        res.send("something went wrong")
-    }
-})
-
-app.delete("/user",async(req,res)=>{
-
-    try{
-
-        const userId=req.body.userId
-        const users=await User.findByIdAndDelete(userId) 
-        res.send("user is deleted successfully")
-
-    }
-    catch(err){
-        res.send("something went wrong" + err)
-    }
-})
-
-app.patch("/user",async(req,res)=>{
-    
-    const data={...req.body}
-
-    delete data.emailId
-    const emailId=req.body.emailId
-
-    console.log(data);
-    console.log(emailId);
-
-    
-
-    try{
-
-        const ALLOWED_UPDATES=["gender","age","password"]
-
-        const isUpdateAllowed=Object.keys(data).every((k)=>ALLOWED_UPDATES.includes(k))
-
-        if(!isUpdateAllowed){
-            throw new Error("Update not allowed")
-        }
-
-        const updatedUser=await User.findOneAndUpdate({emailId},data,{new:true})
-        res.send(updatedUser)
-
-    }
-    catch(err){
-        res.send("something went wrong"+err)
-    }
-})
 
 connectDB().then(
     ()=>{
