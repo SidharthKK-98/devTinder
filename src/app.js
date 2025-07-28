@@ -4,6 +4,7 @@ const app=express()
 const cookie=require('cookie-parser')
 const authRoutes=require("../src/routes/auth")
 const profileRoutes=require("../src/routes/profile")
+const connectionRequest = require('../src/routes/request')
 
 app.use(express.json())
 app.use(cookie())
@@ -11,6 +12,7 @@ app.use(cookie())
 
 app.use("/",authRoutes)
 app.use("/",profileRoutes)
+app.use("/",connectionRequest)
 
 
 
