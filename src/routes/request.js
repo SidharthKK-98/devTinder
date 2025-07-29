@@ -4,6 +4,7 @@ const requestRouter=express.Router()
 const {userAuth}=require("../middlewares/auth")
 const connectionRequestModel=require("../models/connectionRequest")
 const User=require("../models/user")
+
 requestRouter.post("/request/send/:status/:toUserId",userAuth,async(req,res)=>{
 
     try{
@@ -50,6 +51,38 @@ requestRouter.post("/request/send/:status/:toUserId",userAuth,async(req,res)=>{
         
     }
 
+})
+
+requestRouter.post("/request/review/:status/:requestId",userAuth,async(req,res)=>{
+    try{
+
+        const {status,requestId}=req.params
+
+        const allowedStatus=["accepted","rejected"]
+        if(!allowedStatus.includes(status)){
+            return res.status(400).send("invalid status")
+        }
+
+        const connectionRequest=await connectionRequestModel.findOne({
+            _id:requestId,
+            toUserId:req.user._id,
+            status:"interested"
+        })
+        if(!connectionRequest){
+            return res.status(400).send("connection not found")
+        }
+        connectionRequest.status=status
+         const  data= await connectionRequest.save()
+
+         res.status(200).json({
+            message:status+"successfully",
+            data
+         })
+
+    }
+    catch(err){
+        res.status(400).send(err+" error")
+    }
 })
 
 module.exports=requestRouter
