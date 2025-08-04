@@ -60,7 +60,11 @@ userRouter.get("/user/feed",userAuth,async(req,res)=>{
     try{
 
         const loggedInUser=req.user
-        const allUsers=await user.find()
+
+        const page= parseInt(req.query.page) || 1
+        let limit=parseInt(req.query.limit) || 10
+        limit = limit > 50 ? 50 : limit
+         
         
         const connections= await connectionRequestModel.find({
             $or:[
@@ -83,8 +87,7 @@ userRouter.get("/user/feed",userAuth,async(req,res)=>{
                 {_id:{$nin:Array.from(hideUserFromFeed)}},
                 {_id:{$ne:loggedInUser}}//if user has no connection till now
             ]
-        }).select("firstName lastName")
-        console.log(Users);
+        }).select("firstName lastName").skip((page-1)*limit).limit(limit)
         
 
         res.send(Users)
