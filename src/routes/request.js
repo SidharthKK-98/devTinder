@@ -12,6 +12,7 @@ requestRouter.post("/request/send/:status/:toUserId",userAuth,async(req,res)=>{
         const fromUserId=req.user._id
         const toUserId=req.params.toUserId
         const status=req.params.status
+        const photoUrl=req.user.photoUrl
 
         const acceptedStatus=["ignore","interested"]
         if(!acceptedStatus.includes(status)){
@@ -40,8 +41,10 @@ requestRouter.post("/request/send/:status/:toUserId",userAuth,async(req,res)=>{
             fromUserId,
             toUserId,
             status, 
+            photoUrl
+            
         })
-        const data= await connectionRequest.save()
+        const data= await connectionRequest.save() 
         res.send(data) 
 
     }
@@ -66,7 +69,8 @@ requestRouter.post("/request/review/:status/:requestId",userAuth,async(req,res)=
         const connectionRequest=await connectionRequestModel.findOne({
             _id:requestId,
             toUserId:req.user._id,
-            status:"interested"
+            status:"interested",
+
         })
         if(!connectionRequest){
             return res.status(400).send("connection not found")

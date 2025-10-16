@@ -10,9 +10,14 @@ const validator=require("validator")
 authRoutes.post("/signup",async(req,res)=>{
 
   try{
-    const {firstName,lastName,emailId,password,age,gender}=req.body
+    const {firstName,lastName,emailId,password,age,gender,photourl,skills,about}=req.body
     const encryptedPassword=await bcrypt.hash(password,10)
-    console.log(encryptedPassword);
+    // console.log(encryptedPassword);
+
+    const existingUser=await User.findOne({emailId})
+    if(existingUser){
+      return res.status(400).json({message:"user is already existing"})
+    }
     
       const user=new User({
         firstName,
@@ -20,15 +25,29 @@ authRoutes.post("/signup",async(req,res)=>{
         emailId,
         password:encryptedPassword,
         age,
-        gender
+        gender,
+        photourl,
+        skills,
+        about
+
       })
     
-    await user.save()
-    res.send("user added successfully")
+    const savedUser=await user.save()
+    // res.json({message:"user added successfully",data:savedUser})
+
+    const token=  savedUser.getJWT() 
+        
+        res.cookie("token",token)
+
+        res.status(200).json({
+            message:"signup successfull",
+            user:savedUser
+            
+        })
   }
   catch(err){
 
-    res.status(400).send("something went wrong" + err)
+    res.status(400).send("something went wrong" + err.message)
     console.log(err);
     
   }
@@ -42,19 +61,23 @@ authRoutes.post("/login",async(req,res)=>{
         
 
     if(!validator.isEmail(emailId)){
-        throw new Error("invalid credentials")
-    }
+        // throw new Error("invalid credentials")
+        return res.status(400).json({error:"invalid credentials"})
 
+    }
+ 
     const user=await User.findOne({emailId})
 
     if(!user){
-        throw new Error("no user present")
+        return res.status(400).json({error:"no user present"})
+
+        // throw new Error("no user present")
     }
 
     const isPassworValid=await user.validatePassword(password)
 
     if(!isPassworValid){
-        res.send("invalid credentials")
+        return res.status(400).json({error:"invalid credentials"})
     }
     else{
         const token=  user.getJWT() 
@@ -62,14 +85,15 @@ authRoutes.post("/login",async(req,res)=>{
         res.cookie("token",token)
 
         res.status(200).json({
-            message:"login successfull"
+            message:"login successfull",
+            user
             
         })
     }
     }
     catch(err){
 
-    res.status(400).send("something went wrong" + err)
+    res.status(400).json("something went wrong" + err)
     console.log(err);
     
   }
@@ -81,4 +105,4 @@ authRoutes.post("/logout",(req,res)=>{
   res.status(200).send("loggedout successfully")
 })
 
-module.exports=authRoutes
+module.exports=authRoutes 

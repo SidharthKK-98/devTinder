@@ -41,13 +41,13 @@ profileRouter.patch("/profile/edit",userAuth,async(req,res)=>{
 
             ))
             await req.user.save()
-            res.send(req.user)
+            res.json({message:"updated Successfully",data:req.user})
             
 
    }
    catch(err){
-          res.status(400).send("something went wrong" + err)
-          console.log(err); 
+          res.status(400).json( err.message)
+          console.log(err.message); 
    }
      
 })

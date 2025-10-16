@@ -8,7 +8,7 @@ const userAuth=async(req,res,next)=>{
     if(!token){
         console.log("invalid token");
         
-        res.send("invalid token")
+        res.status(401).send("invalid token")
 
     }
     const decodedValue= jwt.verify(token,"sid@kk")
@@ -21,6 +21,7 @@ const userAuth=async(req,res,next)=>{
     }
 
     req.user=validUser
+    // console.log("validUser",validUser)
     next()
    }
    catch(err){

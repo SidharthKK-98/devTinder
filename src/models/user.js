@@ -32,8 +32,31 @@ const userSchema= new mongoose.Schema({
         min:18
     },
     gender:{
-        type:String
+        type:String,
+        enum: {
+    values: ["male", "female", "others"],
+    message: "{VALUE} is not a valid gender"
+  },
+    },
+     photoUrl: {
+        type: String,
+        validate(value) {
+            if (value && !validator.isURL(value)) {
+                throw new Error("Invalid photo URL");
+            }
+        },
+        default:"https://static.vecteezy.com/system/resources/previews/003/715/527/non_2x/picture-profile-icon-male-icon-human-or-people-sign-and-symbol-vector.jpg"
+    },
+    
+    about: {
+        type: String,
+        maxLength: 500,
+        default:"this is about me"
     }
+    // skills: {
+    //     type: [String], // array of strings
+    //     default: []
+    // },
 
 },{timestamps:true})
 

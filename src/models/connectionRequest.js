@@ -21,6 +21,10 @@ const connectionRequestSchema= new mongoose.Schema({
         },
         required:true
 
+    },
+    photoUrl:{
+        type:String,
+        
     }
 },{timestamps:true})
 
@@ -30,7 +34,7 @@ connectionRequestSchema.pre("save",function(next){
         throw new Error("you can not send request to yourself")
     }
     next()
-})
+}) 
 
 
 module.exports=mongoose.model("connectionRequestModel",connectionRequestSchema)

@@ -3,6 +3,8 @@ const userRouter=express.Router()
 const {userAuth}=require("../middlewares/auth")
 const connectionRequestModel=require("../models/connectionRequest")
 const user=require("../models/user")
+
+
 userRouter.get("/user/request/recieved",userAuth,async(req,res)=>{
     try{
 
@@ -33,14 +35,14 @@ userRouter.get("/user/connections",userAuth,async(req,res)=>{
                 {fromUserId:loggedUser,status:"accepted"},
                 {toUserId:loggedUser,status:"accepted"}
             ]
-        }).populate("fromUserId","firstName lastName").populate("toUserId","firstName lastName")
+        }).populate("fromUserId","firstName lastName age gender photoUrl about").populate("toUserId","firstName lastName age gender photoUrl about")
 
         const data= connections.map(row=>{
             if(row.fromUserId._id.equals(loggedUser._id) ){
                 return row.toUserId
             }
             else{
-                return row.fromUserId
+                return row.fromUserId 
 
             }
         })
@@ -87,10 +89,10 @@ userRouter.get("/user/feed",userAuth,async(req,res)=>{
                 {_id:{$nin:Array.from(hideUserFromFeed)}},
                 {_id:{$ne:loggedInUser}}//if user has no connection till now
             ]
-        }).select("firstName lastName").skip((page-1)*limit).limit(limit)
+        }).select("firstName lastName age gender photoUrl about").skip((page-1)*limit).limit(limit)
         
 
-        res.send(Users)
+        res.json({data:Users})
     }
     catch(err){
         res.status(400).send(err.message)
