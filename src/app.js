@@ -18,10 +18,10 @@ app.use(express.json())
 app.use(cookie())
 
 
-app.use("/",authRoutes)
-app.use("/",profileRoutes)
-app.use("/",connectionRequest)
-app.use("/",userRouter)
+app.use("/api",authRoutes)
+app.use("/api",profileRoutes)
+app.use("/api",connectionRequest)
+app.use("/api",userRouter)
 
 
 
