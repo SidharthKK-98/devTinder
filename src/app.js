@@ -9,7 +9,7 @@ const connectionRequest = require('../src/routes/request')
 const userRouter = require('../src/routes/user')
 
 app.use(cors({
-    origin:"http://localhost:5173",
+    origin:["http://localhost:5173", "http://13.201.128.216"],
     credentials:true
 
 }
