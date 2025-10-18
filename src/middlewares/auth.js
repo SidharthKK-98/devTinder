@@ -11,7 +11,7 @@ const userAuth=async(req,res,next)=>{
         res.status(401).send("invalid token")
 
     }
-    const decodedValue= jwt.verify(token,"sid@kk")
+    const decodedValue= jwt.verify(token,process.env.JWT_KEY)
     const {_id}= decodedValue
     
 
