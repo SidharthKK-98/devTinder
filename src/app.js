@@ -34,10 +34,11 @@ app.use("/",paymentRoutes)
 connectDB().then(
     ()=>{
         console.log("database connected successfully");
+        const PORT = process.env.PORT || 3000;
 
-        app.listen(3000,()=>{
+        app.listen(PORT,()=>{
     
-        console.log("server start on  port 3000");
+        console.log(`server start on  port ${PORT}`);
     
 })
         
