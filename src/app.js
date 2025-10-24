@@ -8,6 +8,7 @@ const authRoutes=require("../src/routes/auth")
 const profileRoutes=require("../src/routes/profile")
 const connectionRequest = require('../src/routes/request')
 const userRouter = require('../src/routes/user')
+const paymentRoutes = require('./routes/payment')
 
 app.use(cors({
     origin:["http://localhost:5173", "http://13.201.128.216"],
@@ -19,10 +20,12 @@ app.use(express.json())
 app.use(cookie())
 
 
-app.use("/api",authRoutes)
-app.use("/api",profileRoutes)
-app.use("/api",connectionRequest)
-app.use("/api",userRouter)
+app.use("/",authRoutes)
+app.use("/",profileRoutes)
+app.use("/",connectionRequest)
+app.use("/",userRouter)
+app.use("/",paymentRoutes)
+
 
 
 
