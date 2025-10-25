@@ -4,6 +4,8 @@ const paymentRoutes=express.Router()
 const RazoprpayInstance=require("../utils/razorpay")
 const Payment= require("../models/payments")
 const { membershipAmount } = require("../utils/constants")
+const {validateWebhookSignature} = require('razorpay/dist/utils/razorpay-utils')
+
 
 
 
@@ -44,6 +46,27 @@ paymentRoutes.post("/payment/create",userAuth,async(req,res)=>{
     catch(err){
         res.json({message:"error occured",data:err.message})
     }
+})
+
+paymentRoutes.post("/payment/webhook",async(req,res)=>{
+
+
+    try{
+
+        const webhookSignature=req.headers["X-Razorpay-Signature"]
+
+        const isWebhookValid=validateWebhookSignature(JSON.stringify(webhookBody), webhookSignature, process.env.RAZORPAY_WEBHOOK_SECRET)
+
+        if(!isWebhookValid){
+            res.status(400).json({message:"webhook is not valid"})
+        }
+        console.log(req.body)
+    }
+    catch(err){
+        console.log(err);
+        
+    }
+
 })
 
 
