@@ -37,7 +37,10 @@ authRoutes.post("/signup",async(req,res)=>{
 
     const token=  savedUser.getJWT() 
         
-        res.cookie("token",token)
+        res.cookie("token",token,{
+          httpOnly: true,
+          sameSite:"none"
+        })
 
         res.status(200).json({
             message:"signup successfull",
@@ -82,7 +85,10 @@ authRoutes.post("/login",async(req,res)=>{
     else{
         const token=  user.getJWT() 
         
-        res.cookie("token",token)
+        res.cookie("token",token,{
+          httpOnly: true,
+          sameSite:"none"
+        })
 
         res.status(200).json({
             message:"login successfull",
