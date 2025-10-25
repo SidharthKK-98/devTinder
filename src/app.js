@@ -11,7 +11,7 @@ const userRouter = require('../src/routes/user')
 const paymentRoutes = require('./routes/payment')
 
 app.use(cors({
-    origin:["http://localhost:5173", "http://13.201.128.216","dev-tinder-frontend-gray.vercel.app"],
+    origin:["http://localhost:5173", "http://13.201.128.216","https://dev-tinder-frontend-gray.vercel.app"],
     credentials:true
 
 }
