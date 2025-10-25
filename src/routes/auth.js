@@ -39,7 +39,8 @@ authRoutes.post("/signup",async(req,res)=>{
         
         res.cookie("token",token,{
           httpOnly: true,
-          sameSite:"none"
+          sameSite:"none",
+          secure: true
         })
 
         res.status(200).json({
@@ -87,7 +88,8 @@ authRoutes.post("/login",async(req,res)=>{
         
         res.cookie("token",token,{
           httpOnly: true,
-          sameSite:"none"
+          sameSite:"none",
+          secure: true
         })
 
         res.status(200).json({
