@@ -52,6 +52,13 @@ const userSchema= new mongoose.Schema({
         type: String,
         maxLength: 500,
         default:"this is about me"
+    },
+    isPremium:{
+        type:Boolean,
+        default:false
+    },
+    membershipType:{
+        type:String
     }
     // skills: {
     //     type: [String], // array of strings

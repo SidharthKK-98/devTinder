@@ -3,6 +3,8 @@ const { userAuth } = require("../middlewares/auth")
 const paymentRoutes=express.Router()
 const RazoprpayInstance=require("../utils/razorpay")
 const Payment= require("../models/payments")
+const User= require("../models/user")
+
 const { membershipAmount } = require("../utils/constants")
 const {validateWebhookSignature} = require('razorpay/dist/utils/razorpay-utils')
 
@@ -58,9 +60,22 @@ paymentRoutes.post("/payment/webhook",async(req,res)=>{
         const isWebhookValid=validateWebhookSignature(JSON.stringify(webhookBody), webhookSignature, process.env.RAZORPAY_WEBHOOK_SECRET)
 
         if(!isWebhookValid){
-            res.status(400).json({message:"webhook is not valid"})
+            return res.status(400).json({message:"webhook is not valid"})
         }
-        console.log(req.body)
+
+        const paymentDetails=req.body.payload.payment.entity
+        const payment=await Payment.findOne({orderId:paymentDetails.order_id})
+        payment.status=paymentDetails.status
+        await payment.save()
+
+        const user=await User.findOne({_id:payment.userId})
+        user.isPremium=true
+        user.membershipType=payment.notes.membershipType
+        await user.save()
+
+
+        return res.status(200).json({msg:"webhook recieved"})
+        // console.log(req.body)
 
     }
     catch(err){
