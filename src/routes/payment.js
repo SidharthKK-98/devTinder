@@ -65,25 +65,40 @@ paymentRoutes.post("/payment/webhook",async(req,res)=>{
         }
 
         const paymentDetails=req.body.payload.payment.entity
+
         const payment=await Payment.findOne({orderId:paymentDetails.order_id})
         payment.status=paymentDetails.status
         await payment.save()
 
         const user=await User.findOne({_id:payment.userId})
-        if(user){
+
+        if(user && paymentDetails.status==="captured"){
         user.isPremium=true
         user.membershipType=payment.notes.membershipType
         await user.save()
         }
 
+        
+
+
         return res.status(200).json({msg:"webhook recieved"})
-        // console.log(req.body)
 
     }
     catch(err){
         console.log(err);
         
     }
+
+})
+
+paymentRoutes.get("/premium/verify",userAuth,async(req,res)=>{
+
+    const user=req.user
+    if(user.isPremium){ 
+        return res.json({isPremium:true})
+    }
+    return res.json({isPremium:false})
+
 
 })
 
