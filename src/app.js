@@ -9,6 +9,11 @@ const profileRoutes=require("../src/routes/profile")
 const connectionRequest = require('../src/routes/request')
 const userRouter = require('../src/routes/user')
 const paymentRoutes = require('./routes/payment')
+const http=require("http")
+const initializeSocket = require('./utils/socket')
+
+const server=http.createServer(app)
+initializeSocket(server)
 
 app.use(cors({
     origin:["http://localhost:5173", "http://13.201.128.216","https://dev-tinder-frontend-gray.vercel.app"],
@@ -18,6 +23,7 @@ app.use(cors({
 ))
 app.use(express.json())
 app.use(cookie())
+
 
 
 app.use("/",authRoutes)
@@ -36,7 +42,7 @@ connectDB().then(
         console.log("database connected successfully");
         const PORT = process.env.PORT || 3000;
 
-        app.listen(PORT,()=>{
+        server.listen(PORT,()=>{
     
         console.log(`server start on  port ${PORT}`);
     
