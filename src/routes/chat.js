@@ -12,7 +12,7 @@ chatRoutes.get("/chat/:targetUserId",userAuth,async(req,res)=>{
 
         let chat=await Chat.findOne(
             {participants:{$all:[userId,targetUserId]}
-        }).populate("messages.senderId","firstName lastName")
+        }).populate("messages.senderId","firstName lastName photoUrl")
 
         if(!chat){
 

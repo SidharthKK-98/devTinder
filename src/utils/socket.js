@@ -3,13 +3,28 @@ const Chat = require("../models/chat")
 
 const initializeSocket=(server)=>{
 
+    let onlineUsers= new Map()
+
+
     const io=socket(server,{
         cors:{
-            origin:"http://localhost:5173"
+            origin:["http://localhost:5173","https://dev-tinder-frontend-gray.vercel.app"]
         }
     })
+
+
     
     io.on("connection",(socket)=>{
+
+
+        socket.on("usersConnected",({userId})=>{
+
+            onlineUsers.set(userId,socket.id)
+            console.log(onlineUsers);
+            
+            io.emit("onlineUsers",[...onlineUsers.keys()])
+
+        })
 
         socket.on("joinChat",({userId,targetUserId})=>{
 
@@ -20,7 +35,7 @@ const initializeSocket=(server)=>{
 
         })
 
-        socket.on("sendMessage",async({firstName,userId,targetUserId,text})=>{
+        socket.on("sendMessage",async({firstName,lastName,userId,targetUserId,text})=>{
 
 
             try{
@@ -45,7 +60,7 @@ const initializeSocket=(server)=>{
 
                 await chat.save()
 
-            io.to(roomId).emit("messageReceived",{firstName,text})
+            io.to(roomId).emit("messageReceived",{firstName,lastName,text})
 
 
             }
@@ -56,7 +71,22 @@ const initializeSocket=(server)=>{
 
         })
 
-        socket.on("disconnect",()=>{})
+        socket.on("disconnect",()=>{
+
+            for(let [userId,socketId] of onlineUsers.entries()){
+                if(socketId==socket.id){
+                    onlineUsers.delete(userId)
+                    break
+                }
+            }
+
+            io.emit("onlineUsers",[...onlineUsers.keys()])
+            console.log("userDisconnected : ",socket.id);
+            console.log(onlineUsers);
+
+            
+
+        })
     
     })
 
