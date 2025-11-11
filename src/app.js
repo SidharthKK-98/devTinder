@@ -43,7 +43,7 @@ app.use("/",chatRoutes)
 connectDB().then(
     ()=>{
         console.log("database connected successfully");
-        const PORT = process.env.PORT || 3000;
+        const PORT = process.env.PORT || 3001;
 
         server.listen(PORT,()=>{
     

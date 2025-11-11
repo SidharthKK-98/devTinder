@@ -13,7 +13,7 @@ userRouter.get("/user/request/recieved",userAuth,async(req,res)=>{
         const recievedRequests=await connectionRequestModel.find({
             toUserId:loggedUser,
             status:"interested"
-        }).populate("fromUserId","firstName lastName")
+        }).populate("fromUserId","firstName lastName photoUrl")
 
         res.status(200).json({
             message: "result",
