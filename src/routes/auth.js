@@ -10,7 +10,7 @@ const validator=require("validator")
 authRoutes.post("/signup",async(req,res)=>{
 
   try{
-    const {firstName,lastName,emailId,password,age,gender,photourl,skills,about}=req.body
+    const {firstName,lastName,emailId,password,age,gender,photoUrl,skills,about}=req.body
     const encryptedPassword=await bcrypt.hash(password,10)
     // console.log(encryptedPassword);
 
@@ -26,7 +26,7 @@ authRoutes.post("/signup",async(req,res)=>{
         password:encryptedPassword,
         age,
         gender,
-        photourl,
+        photoUrl,
         skills,
         about
 
